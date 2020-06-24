@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from matplotlib import pyplot as plt
 from bs4 import BeautifulSoup as bs
 from tqdm import tqdm
@@ -42,7 +41,7 @@ def load_domestic_data():
                 rpms_data.at[rel_date,'Total Domestic RPMs']+= row['PASSENGERS'] * row['DISTANCE']
     
             
-                if str(int(row['AIRLINE_ID'])) in lcc_ids:
+                if row['AIRLINE_ID'] in lcc_ids:
                     rpms_data.at[rel_date,'Domestic LCC RPMs']+= row['PASSENGERS'] * row['DISTANCE']
             except ValueError:
                 print('ValueError: most likely NaN')
@@ -54,9 +53,7 @@ def load_domestic_data():
 
 def load_unemployement():
     db = pd.read_csv('data\\unemployement.csv')
-    
-    years = db['Year']
-    
+        
     ndb = pd.DataFrame(columns=['Date','Unemployement'])
     
     for index, row in db.iterrows():
@@ -65,11 +62,49 @@ def load_unemployement():
             ndb.loc[index*12+month] = [date,value]
 
 def load_fuel_prices():
-    old = bs(open('data\\oldfuel.html'),'html.parser')
-    curr = bs(open('data\\fuel.html'),'html.parser')
+    raw = pd.read_csv('data\\jetraw.csv')
+    
+    start_year = 1990
+    end_year = 2020
+    start_date = start_year * 12 + 1
+    end_date = end_year * 12 + 3
+    
+    dates = []
+    for date in range(start_date, end_date + 1):
+        year = date // 12
+        month = date % 12
+        
+        if month == 0:
+            month = 12
+            year-=1
+        dates.append('{}/{}'.format(month,year))
+    
+    columns = ['Date','G','C','CPG']
+    
+    fuel_data = pd.DataFrame(columns=columns, data=zip(dates,[0] * len(dates),[0] * len(dates),[0] * len(dates)))
 
-    print(old.find_all('tbody'))
+    for index, row in tqdm(raw.iterrows()):
+        year = int(row['YEAR'])     
+        month = int(row['MONTH'])     
+        
+        rel_date = year * 12 + month - start_date
+    
+        try:                
+            fuel_data.at[rel_date,'C']+= row['TDOMT_COST']
+            fuel_data.at[rel_date,'G']+= row['TDOMT_GALLONS']
+        except ValueError:
+            continue
+        except:
+            print('Unknown exception caught')
+            
+    fuel_data['CPG'] = fuel_data['C'] / fuel_data['G']
+    
+    del fuel_data['C']
+    del fuel_data['G']
 
+    print(fuel_data)
+    
+    fuel_data.to_csv('domestic_cpg.csv', index = False)
     
 def plot_rpms():
     data = pd.read_csv('data\\domestic_rpms.csv')
@@ -141,10 +176,29 @@ def plot_unemployement():
     
     axes.plot(data['Date'], data['Unemployement'])
 
+def plot_cpg():
+    data = pd.read_csv('data\\domestic_cpg.csv')
+    fig = plt.figure(figsize=(15,2))
+    axes = fig.add_subplot(111)
+
+    axes.set_title('Jet Fuel Cost Per Gallon Time Series')
+    
+    plt.xlabel('Date')
+    plt.ylabel('CPG')
+
+    frq = 10
+    step = max(int(len(data['Date'])/frq),1)
+    tck = range(0,len(data['Date']), step)
+    tck_dates = []
+    for i in tck:
+        tck_dates.append(data['Date'][i])
+    plt.xticks(tck, tck_dates)
+    
+    axes.plot(data['Date'], data['CPG'])
 #plot_rpms()
 #plot_lcc_market_share()
 #plot_unemployement()
-
-#plt.show()
-load_domestic_data()
+plot_cpg()
+plt.show()
+#load_domestic_data()
 #load_fuel_prices()
