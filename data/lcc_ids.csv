@@ -16,6 +16,7 @@ id,Airline
 22030,French bee: BF
 19464,Transavia Holland B. V.: HVQ
 21823,Norwegian Air International Ltd.: D8
+20176,National Airlines: N7
 21579,Norwegian Air Shuttle ASA: DY
 21924,Norwegian Air UK Limited: DI
 21624,Jet2.com: LS
@@ -28,8 +29,9 @@ id,Airline
 20436,Frontier Airlines Inc.: F9
 19389,Air Florida Inc.: QH
 19393,Southwest Airlines Co.: WN
-19727,Skybus Inc.: FW
+21177,"Skybus Airlines, Inc.: SX"
 19810,Mid Pacific Airlines Inc.: MPA
+19391,Pacific Southwest Airlines: PS (1)
 19991,America West Airlines Inc.: HP (Merged with US Airways 9/05.Stopped reporting 10/07.)
 20202,Chicago Express Airlines: C8 (1)
 20312,ATA Airlines d/b/a ATA: TZ
@@ -37,15 +39,22 @@ id,Airline
 20265,Freedom Airlines d/b/a HP Expr: F8
 20404,Independence Air: DH
 20294,Jetsgo: SG
+20088,Tower Air Inc.: FF
+20299,Southeast Airlines: JX
+19049,Southeast Airlines Inc.: SLZ
+20295,Midway Airlines Inc. (1): ML (1)
 20099,Laker Airways Inc.: 6F
 19858,Monarch Airlines: ZB
 20031,People Express Airlines Inc.: PE (1)
 21939,Primera Air Scandinavia: PF
 20347,Pro Air Inc.: P9
+21171,Virgin America: VX
+20078,Western Pacific Airlines: W7
 20354,Aerodynamics Inc. d/b/a SkyValue d/b/a SkyValue Airways: AJQ
 19511,Sterling Airways A/S: NBQ
 21860,Scoot Tigerair Pte Ltd d/b/a Scoot: TR
 20243,Valujet Airlines Inc.: J7
+20192,Vanguard Airlines Inc.: NJ
 20049,Western Air Lines Inc.: WA (1)
 21598,WOW Air ehf: WW
 20368,Allegiant Air: G4

@@ -227,10 +227,11 @@ def plot_cpg():
     plt.xticks(tck, tck_dates)
     
     axes.plot(data['Date'], data['CPG'])
-#plot_rpms()
-#plot_lcc_market_share()
+plot_rpms()
+plot_lcc_market_share()
 #plot_unemployement()
 #plot_cpg()
-plot_labor_force()
+#plot_labor_force()
 
+#load_domestic_data()
 plt.show()
