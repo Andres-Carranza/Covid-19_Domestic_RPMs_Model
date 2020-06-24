@@ -52,7 +52,7 @@ def load_domestic_data():
     rpms_data.to_csv('domestic_rpms.csv', index = False)
 
 def load_unemployement():
-    db = pd.read_csv('data\\unemployement.csv')
+    db = pd.read_csv('data\\raw_unemployement.csv')
         
     ndb = pd.DataFrame(columns=['Date','Unemployement'])
     
@@ -60,7 +60,19 @@ def load_unemployement():
         for month, value in enumerate(row[1:]):
             date = '{}/{}'.format(month+1, int(row[0]))
             ndb.loc[index*12+month] = [date,value]
+    ndb.to_csv('unemployement.csv',index = false)
 
+def load_labor_force():
+    db = pd.read_csv('data\\raw_force.csv')
+        
+    ndb = pd.DataFrame(columns=['Date','Labor Force'])
+    
+    for index, row in db.iterrows():
+        for month, value in enumerate(row[1:]):
+            date = '{}/{}'.format(month+1, int(row[0]))
+            ndb.loc[index*12+month] = [date,value]
+    ndb.to_csv('labor_force.csv',index = False)
+            
 def load_fuel_prices():
     raw = pd.read_csv('data\\jetraw.csv')
     
@@ -175,7 +187,27 @@ def plot_unemployement():
     plt.xticks(tck, tck_dates)
     
     axes.plot(data['Date'], data['Unemployement'])
+    
+def plot_labor_force():
+    data = pd.read_csv('data\\labor_force.csv')
+    fig = plt.figure(figsize=(15,2))
+    axes = fig.add_subplot(111)
 
+    axes.set_title('Labor Force Time Series')
+    
+    plt.xlabel('Date')
+    plt.ylabel('Labor Force (thousands)')
+
+    frq = 10
+    step = max(int(len(data['Date'])/frq),1)
+    tck = range(0,len(data['Date']), step)
+    tck_dates = []
+    for i in tck:
+        tck_dates.append(data['Date'][i])
+    plt.xticks(tck, tck_dates)
+    
+    axes.plot(data['Date'], data['Labor Force'])
+    
 def plot_cpg():
     data = pd.read_csv('data\\domestic_cpg.csv')
     fig = plt.figure(figsize=(15,2))
@@ -198,7 +230,7 @@ def plot_cpg():
 #plot_rpms()
 #plot_lcc_market_share()
 #plot_unemployement()
-plot_cpg()
+#plot_cpg()
+plot_labor_force()
+
 plt.show()
-#load_domestic_data()
-#load_fuel_prices()
