@@ -30,7 +30,7 @@ def load_data():
 
 def apply_inverse(training_data):
     #Inverse squares of normalized data
-    training_data['Months_After_Covid-19'] = 1 / training_data['Months_After_Covid-19'] ** -.5
+    training_data['Months_After_Covid-19'] = 1 / training_data['Months_After_Covid-19'] ** 1.5
     training_data['Months_After_9/11'] = 1 / training_data['Months_After_9/11'] **2
     training_data = training_data.replace(math.inf,0)
     return training_data
@@ -70,7 +70,9 @@ def get_max_vals():
                 'RPMs': max(training_data['RPMs'])}    
 def get_feature_layer(data):
     feature_columns = []
-    for column in data.columns[1:-2]:
+    for column in data.columns:
+        if column == 'RPMs' or column == 'Date':
+            continue
         feature_columns.append(tf.feature_column.numeric_column(column))
     return tf.keras.layers.DenseFeatures(feature_columns)
 
@@ -90,15 +92,9 @@ def create_model(learning_rate, feature_layer):
     model.add(feature_layer)
     
 
-    
-    model.add(tf.keras.layers.Dense(units=200, 
-                                  activation='relu', 
-                                  name='Hidden3'))
-    model.add(tf.keras.layers.Dropout(rate=0.07))
-    model.add(tf.keras.layers.Dense(units=128, 
+    model.add(tf.keras.layers.Dense(units=128 ,
                                   activation='relu', 
                                   name='Hidden4')) 
-
     model.add(tf.keras.layers.Dense(units=64 ,
                                   activation='relu', 
                                   name='Hidden4')) 
@@ -139,7 +135,7 @@ def train():
     
     #The following variables are the hyperparameters.
     learning_rate = 0.01
-    epochs = 100
+    epochs = 300
     batch_size = None
     
     model = create_model(learning_rate, feature_layer)
@@ -157,5 +153,5 @@ def train():
     plot_the_loss_curve(epochs, mse)
     
     
-    model.save('models\\reg_model\\')
+    model.save('models\\model\\')
 #train()
