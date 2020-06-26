@@ -1,11 +1,12 @@
 import pandas as pd
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras import layers
+from tensorflow.keras import layers, regularizers
+from tensorflow import keras
 from matplotlib import pyplot as plt
-import seaborn as sns
 import math
-
+from datetime import datetime
+import shutil
 def load_data():
     model_data = pd.read_csv('data\\raw\\model_data.csv')
     
@@ -28,20 +29,19 @@ def load_data():
     
     model_data.to_csv('model_data.csv', index = False)
 
-def apply_inverse(training_data):
+def apply_inverse(training_data,model):
     #Inverse squares of normalized data
-    training_data['Months_After_Covid-19'] = 1 / training_data['Months_After_Covid-19'] ** 1.5
     training_data['Months_After_9/11'] = 1 / training_data['Months_After_9/11'] **2
     training_data = training_data.replace(math.inf,0)
+
     return training_data
 
-def get_normalized_data():
+def get_normalized_data(model = 1):
     training_data = pd.read_csv('data\\training_data.csv')
     
 
-    training_data = apply_inverse(training_data)
+    training_data = apply_inverse(training_data,model)
 
-    training_data['Months_After_Covid-19'] = training_data['Months_After_Covid-19'] / max(training_data['Months_After_Covid-19'])
     training_data['Months_After_9/11'] = training_data['Months_After_9/11'] / max(training_data['Months_After_9/11'])
 
     training_data['CPG'] = training_data['CPG'] / max(training_data['CPG'])
@@ -51,27 +51,42 @@ def get_normalized_data():
     training_data['Unemployement'] = training_data['Unemployement'] / max(training_data['Unemployement'])
     
     training_data['Labor_Force'] = training_data['Labor_Force'] / max(training_data['Labor_Force'])
-
-    training_data['RPMs'] = training_data['RPMs'] / max(training_data['RPMs'])
     
+    training_data['Avg'] = np.log(training_data['Avg'] )
+    training_data['Avgd'] = np.log(training_data['Avgd'] )
+    training_data = training_data.replace(-math.inf,0)
+
+    training_data['Avg'] = training_data['Avg']/ max(training_data['Avg'])
+    training_data['Avgd'] = training_data['Avgd']/ max(training_data['Avgd'])
+
+    training_data['RPMs'] = np.log(training_data['RPMs'] )
+    training_data['RPMs'] = training_data['RPMs'] / max(training_data['RPMs'])
+
     return training_data
 
-def get_max_vals():
+def get_max_vals(model =1):
     training_data = pd.read_csv('data\\training_data.csv')
-    
-    training_data = apply_inverse(training_data)
 
-    return { 'Months_After_Covid-19': max(training_data['Months_After_Covid-19']),
+    training_data['Avg'] = np.log(training_data['Avg'] )
+    training_data['Avgd'] = np.log(training_data['Avgd'] )
+    training_data = training_data.replace(-math.inf,0)
+    
+    training_data = apply_inverse(training_data,model)
+    training_data['RPMs'] = np.log(training_data['RPMs'] )
+
+    return { 
                 'Months_After_9/11': max(training_data['Months_After_9/11']),
                 'CPG': max(training_data['CPG']),
                 'LCC_Market_Share': max(training_data['LCC_Market_Share']),
                 'Unemployement': max(training_data['Unemployement']),
                 'Labor_Force': max(training_data['Labor_Force']),
-                'RPMs': max(training_data['RPMs'])}    
+                'RPMs': max(training_data['RPMs']),
+                'Avg':max(training_data['Avg']),
+                'Avgd':max(training_data['Avgd'])}    
 def get_feature_layer(data):
     feature_columns = []
     for column in data.columns:
-        if column == 'RPMs' or column == 'Date':
+        if column in['RPMs','Date','LCC_Market_Share'] :
             continue
         feature_columns.append(tf.feature_column.numeric_column(column))
     return tf.keras.layers.DenseFeatures(feature_columns)
@@ -91,13 +106,32 @@ def create_model(learning_rate, feature_layer):
     
     model.add(feature_layer)
     
+    reg_rate = 0.00
+    dropout_rate= 0.0
+    model.add(tf.keras.layers.Dense(units=300,
+                                  activation='relu',
+                                  kernel_regularizer=regularizers.l2(reg_rate) ))
+    model.add(tf.keras.layers.Dropout(rate=dropout_rate))
 
-    model.add(tf.keras.layers.Dense(units=128 ,
-                                  activation='relu', 
-                                  name='Hidden4')) 
-    model.add(tf.keras.layers.Dense(units=64 ,
-                                  activation='relu', 
-                                  name='Hidden4')) 
+
+    model.add(tf.keras.layers.Dense(units=300,
+                                  activation='relu',
+                                  kernel_regularizer=regularizers.l2(reg_rate) ))  
+    
+    model.add(tf.keras.layers.Dense(units=128,
+                                  activation='relu',
+                                  kernel_regularizer=regularizers.l2(reg_rate) ))    
+    model.add(tf.keras.layers.Dropout(rate=dropout_rate))
+
+    model.add(tf.keras.layers.Dense(units=128,
+                                  activation='relu',
+                                  kernel_regularizer=regularizers.l2(reg_rate) ))  
+    model.add(tf.keras.layers.Dropout(rate=dropout_rate))
+
+
+    model.add(tf.keras.layers.Dense(units=128,
+                                  activation='relu',
+                                  kernel_regularizer=regularizers.l2(reg_rate) ))  
     # Define the output layer.
     model.add(tf.keras.layers.Dense(units=1,  
                                   name='Output'))                              
@@ -107,13 +141,14 @@ def create_model(learning_rate, feature_layer):
                 metrics=[tf.keras.metrics.MeanSquaredError()])
 
     return model
+
 def train_model(model, dataset, epochs, label_name, batch_size=None):
     # Split the dataset into features and label.
     del dataset['Date']
+    del dataset['LCC_Market_Share']
     features = {name:np.array(value) for name, value in dataset.items()}
-    
     label = np.array(features.pop(label_name))
-
+    
     history = model.fit(x=features, y=label, batch_size=batch_size,epochs=epochs) 
     
     # The list of epochs is stored separately from the rest of history.
@@ -135,7 +170,7 @@ def train():
     
     #The following variables are the hyperparameters.
     learning_rate = 0.01
-    epochs = 300
+    epochs = 100
     batch_size = None
     
     model = create_model(learning_rate, feature_layer)
@@ -150,8 +185,8 @@ def train():
     epochs, mse = train_model(model,training_data , epochs, 
                               label_name, batch_size)
     
-    plot_the_loss_curve(epochs, mse)
+    #plot_the_loss_curve(epochs, mse)
     
-    
-    model.save('models\\model\\')
+    shutil.rmtree('models\\model1\\', ignore_errors=True, onerror=None)
+    model.save('models\\model1\\')
 #train()

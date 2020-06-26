@@ -4,8 +4,9 @@ from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
 import train_model as tm
+import math 
 
-def load_rpm_data(start_index = 0, end_index = 0)  :
+def load_rpm_data(model,start_index = 0, end_index = 0)  :
     data = tm.get_normalized_data()
     historical_data = pd.read_csv('data\\training_data.csv')
     print('\n\n\nLoaded data')
@@ -19,15 +20,13 @@ def load_rpm_data(start_index = 0, end_index = 0)  :
         
     return data.loc[start_index:end_index], historical_data.loc[start_index:end_index]
 
-def normalize_prediction_features(baseline):
+def normalize_prediction_features(baseline,model):
     features = pd.read_csv('data\\prediction_features\\{}.csv'.format(baseline))
 
     max_vals = tm.get_max_vals()
 
-    features = tm.apply_inverse(features)
+    features = tm.apply_inverse(features,model)
 
-    
-    features['Months_After_Covid-19'] = features['Months_After_Covid-19'] / max_vals['Months_After_Covid-19']
     features['Months_After_9/11'] = features['Months_After_9/11'] / max_vals['Months_After_9/11']
 
     features['CPG'] = features['CPG'] / max_vals['CPG']
@@ -37,67 +36,151 @@ def normalize_prediction_features(baseline):
     features['Unemployement'] = features['Unemployement'] / max_vals['Unemployement']
     
     features['Labor_Force'] = features['Labor_Force'] / max_vals['Labor_Force']
-    
+
+    features['Avg'] = np.log(features['Avg'])
+    features['Avgd'] = np.log(features['Avgd'])
+    features = features.replace(-math.inf,0)
+
+    features['Avg'] = features['Avg']/ max_vals['Avg']
+    features['Avgd'] = features['Avgd']/ max_vals['Avgd']
+
     return features
     
 def predict(features_data,model):
-    max_vals = tm.get_max_vals()
-
+    
+    max_vals = tm.get_max_vals(model[1])
+    model = model[0]
     features = {name:np.array(value) for name, value in features_data.items()}
     date = np.array(features.pop('Date'))
-    
+
     prediction = model.predict(features)
     print('Made prediction')
 
     results = pd.DataFrame()
     
     results['Date'] = date    
-    results['RPMs'] = prediction * max_vals['RPMs']
-    
+    results['RPMs'] = np.exp(prediction * max_vals['RPMs'])
+
     results = results.reset_index()
     return results
 
-def plot_results(results, historical_data):
+def plot_results(results, historical_data):      
     fig = plt.figure(figsize=(15,2))
     axes = fig.add_subplot(111)
-    
-    axes.set_title('Monthly Domestic RPMs Time Series Model')
         
+    axes.set_title('Monthly Domestic RPMs Time Series')
+            
     plt.xlabel('Date')
     plt.ylabel('RPMs (billions)')
-        
-    low = min(results['RPMs'])/1000000000
-    high = max(results['RPMs'])/1000000000
-    rng = high-low
+            
+    all_data = results['Model 1']['RPMs'].append(historical_data['RPMs'])#.append(results['Model 3']['RPMs'])
+    low = min(all_data)/1000000000
+    high = max(all_data)/1000000000
+    rng = (high-low)
     axes.set_ylim(int(low-rng*.1), int(high+rng*.1))
-    
-    frq = 10
-    step = max(int(len(results['Date'])/frq),1)
-    tck = range(0,len(results['Date']), step)
+        
+    frq = 8
+    step = max(int(len(results['Model 1']['Date'])/frq),1)
+    tck = range(0,len(results['Model 1']['Date']), step)
     tck_dates = []
     for i in tck:
-        tck_dates.append(results['Date'][i])
+        tck_dates.append(results['Model 1']['Date'][i])
     plt.xticks(tck, tck_dates)
-        
+            
     axes.plot(historical_data['Date'], historical_data['RPMs']/1000000000, label='Actual RPMs')
-    axes.plot(results['Date'], results['RPMs']/1000000000, label='Predicted RPMs')
-    plt.legend(loc="upper left")
+    for model_name in results:
+        model = results[model_name]
+        axes.plot(model['Date'], model['RPMs']/1000000000, label=model_name)
+    plt.legend(loc= "lower left")
+    plt.show()
     
+    
+def plot_change(results, historical_data):
+    fig = plt.figure(figsize=(15,2))
+    axes = fig.add_subplot(111)
+        
+    axes.set_title('Percent Change in RPMs From 2019')
+            
+    plt.xlabel('Date')
+    plt.ylabel('Percent Change')
+                   
+    frq = 8
+    step = max(int(len(results['Model 1']['Date'])/frq),1)
+    tck = range(0,len(results['Model 1']['Date']), step)
+    tck_dates = []
+    for i in tck:
+        tck_dates.append(results['Model 1']['Date'][i])
+    plt.xticks(tck, tck_dates)
+            
+    for model_name in results:
+        model = results[model_name]
+        historical_data = historical_data['RPMs'].reset_index()
+
+        model['change'] = model['RPMs'] / historical_data['RPMs']
+
+        axes.plot(model['Date'], model['change'], label=model_name)
+    plt.legend(loc= "upper left")
+    plt.show()
+
+def predict_historical():
+    results = {}
+
+    model1 = keras.models.load_model('models/model1')
+    rpms_data,historical_data = load_rpm_data(1)
+    results['Model 1']  = predict(rpms_data, [model1,1])
+    
+    '''
+    model2 = keras.models.load_model('models/model2')
+    rpms_data,historical_data = load_rpm_data(2)
+    results['Model 2'] = predict(rpms_data, [model2,2])
+    
+    model3 = keras.models.load_model('models/model3')
+    results['Model 3'] = predict(rpms_data, [model3,1])
+    '''
+    plot_results(results, historical_data)
+
+def predict_recovery(timeline):
+    results = {}
+
+    model1 = keras.models.load_model('models/model1')
+    rpms_data,historical_data = load_rpm_data(1,-170)
+    del rpms_data['LCC_Market_Share']
+
+    results['Model 1']  = predict(rpms_data, [model1,1])
+    prediction_features = normalize_prediction_features('{}_recovery'.format(timeline),1)
+    prediction_results = predict(prediction_features, [model1,1])
+    results['Model 1'] = results['Model 1'].append(prediction_results).reset_index()
+    print(results)
+    plot_results(results, historical_data)
+
+def predict_change(timeline):
+    results = {}
+
+
+    model1 = keras.models.load_model('models/model1')
+    rpms_data,na = load_rpm_data(1,-5)
+    na,historical_data = load_rpm_data(1,-17,-5)
+    results['Model 1']  = predict(rpms_data, [model1,1])
+    prediction_features = normalize_prediction_features('{}_recovery'.format(timeline),1)
+    prediction_results = predict(prediction_features, [model1,1])
+    results['Model 1'] = results['Model 1'].append(prediction_results).reset_index()
+    
+    
+    model2 = keras.models.load_model('models/model2')
+    rpms_data,na = load_rpm_data(2,-5)
+    na,historical_data = load_rpm_data(2,-17,-5)
+    results['Model 2'] = predict(rpms_data, [model2,2])
+    prediction_features = normalize_prediction_features('{}_recovery'.format(timeline),2)
+    prediction_results = predict(prediction_features, [model2,2])
+    results['Model 2'] = results['Model 2'].append(prediction_results).reset_index()
 
     
-model = keras.models.load_model('models/model1')
+    model3 = keras.models.load_model('models/model3')
+    results['Model 3'] = predict(rpms_data, [model3,1])
+    prediction_features = normalize_prediction_features('{}_recovery'.format(timeline),1)
+    prediction_results = predict(prediction_features, [model3,1])
+    results['Model 3'] = results['Model 3'].append(prediction_results).reset_index()
 
-rpms_data,historical_data = load_rpm_data(0,0)
-results = predict(rpms_data, model)
-
-'''
-prediction_features = normalize_prediction_features('current')
-prediction_results = predict(prediction_features, model)
-plot_results(results.append(prediction_results).reset_index(), historical_data)
-
-prediction_features = normalize_prediction_features('2019')
-prediction_results = predict(prediction_features, model)
-plot_results(results.append(prediction_results).reset_index(), historical_data)
-'''
-plot_results(results, historical_data)
-plt.show()
+    plot_change(results, historical_data)
+ 
+predict_recovery('june')  
