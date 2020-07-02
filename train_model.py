@@ -7,30 +7,10 @@ from matplotlib import pyplot as plt
 import math
 from datetime import datetime
 import shutil
-def load_data():
-    model_data = pd.read_csv('data\\raw\\model_data.csv')
-    
-    dummy_vars = pd.read_csv('data\\dummy_vars.csv')
-    del dummy_vars['Date']
-    
-    for dummy_var in dummy_vars.head():
-        model_data[dummy_var] = dummy_vars[dummy_var]
-    
-    
-    model_data['CPG'] = pd.read_csv('data\\domestic_cpg.csv')['CPG']
-    
-    rpms = pd.read_csv('data\\domestic_rpms.csv')
-    model_data['LCC_Market_Share'] = rpms['Domestic LCC RPMs'] / rpms['Total Domestic RPMs']
-    
-    model_data['Unemployement']= pd.read_csv('data\\unemployement.csv')['Unemployement']
-    model_data['Labor_Force']= pd.read_csv('data\\labor_force.csv')['Labor Force']
-    
-    model_data['RPMs'] = rpms['Total Domestic RPMs']
-    
-    model_data.to_csv('model_data.csv', index = False)
 
 def apply_inverse(training_data,model):
     #Inverse squares of normalized data
+    training_data['MSC'] = 1 / training_data['MSC'] **.75
     training_data['Months_After_9/11'] = 1 / training_data['Months_After_9/11'] **2
     training_data = training_data.replace(math.inf,0)
 
@@ -44,22 +24,16 @@ def get_normalized_data(model = 1):
 
     training_data['Months_After_9/11'] = training_data['Months_After_9/11'] / max(training_data['Months_After_9/11'])
 
-    training_data['CPG'] = training_data['CPG'] / max(training_data['CPG'])
  
-    training_data['LCC_Market_Share'] = training_data['LCC_Market_Share'] / max(training_data['LCC_Market_Share'])
+    training_data['MSC'] = training_data['MSC'] / max(training_data['MSC'])
 
     training_data['Unemployement'] = training_data['Unemployement'] / max(training_data['Unemployement'])
     
     training_data['Labor_Force'] = training_data['Labor_Force'] / max(training_data['Labor_Force'])
-    
-    training_data['Avg'] = np.log(training_data['Avg'] )
-    training_data['Avgd'] = np.log(training_data['Avgd'] )
-    training_data = training_data.replace(-math.inf,0)
 
     training_data['Avg'] = training_data['Avg']/ max(training_data['Avg'])
     training_data['Avgd'] = training_data['Avgd']/ max(training_data['Avgd'])
 
-    training_data['RPMs'] = np.log(training_data['RPMs'] )
     training_data['RPMs'] = training_data['RPMs'] / max(training_data['RPMs'])
 
     return training_data
@@ -67,26 +41,20 @@ def get_normalized_data(model = 1):
 def get_max_vals(model =1):
     training_data = pd.read_csv('data\\training_data.csv')
 
-    training_data['Avg'] = np.log(training_data['Avg'] )
-    training_data['Avgd'] = np.log(training_data['Avgd'] )
-    training_data = training_data.replace(-math.inf,0)
-    
     training_data = apply_inverse(training_data,model)
-    training_data['RPMs'] = np.log(training_data['RPMs'] )
 
     return { 
                 'Months_After_9/11': max(training_data['Months_After_9/11']),
-                'CPG': max(training_data['CPG']),
-                'LCC_Market_Share': max(training_data['LCC_Market_Share']),
                 'Unemployement': max(training_data['Unemployement']),
                 'Labor_Force': max(training_data['Labor_Force']),
                 'RPMs': max(training_data['RPMs']),
                 'Avg':max(training_data['Avg']),
-                'Avgd':max(training_data['Avgd'])}    
+                'Avgd':max(training_data['Avgd']),
+                'MSC':max(training_data['MSC'])}    
 def get_feature_layer(data):
     feature_columns = []
     for column in data.columns:
-        if column in['RPMs','Date','LCC_Market_Share'] :
+        if column in['RPMs','Date','Labor_Force'] :
             continue
         feature_columns.append(tf.feature_column.numeric_column(column))
     return tf.keras.layers.DenseFeatures(feature_columns)
@@ -107,28 +75,34 @@ def create_model(learning_rate, feature_layer):
     model.add(feature_layer)
     
     reg_rate = 0.00
-    dropout_rate= 0.0
-    model.add(tf.keras.layers.Dense(units=300,
-                                  activation='relu',
-                                  kernel_regularizer=regularizers.l2(reg_rate) ))
-    model.add(tf.keras.layers.Dropout(rate=dropout_rate))
-
-
-    model.add(tf.keras.layers.Dense(units=300,
+    dropout_rate= 0.005
+    model.add(tf.keras.layers.Dense(units=1000,
                                   activation='relu',
                                   kernel_regularizer=regularizers.l2(reg_rate) ))  
-    
-    model.add(tf.keras.layers.Dense(units=128,
+    model.add(tf.keras.layers.Dense(units=500,
+                                  activation='relu',
+                                  kernel_regularizer=regularizers.l2(reg_rate) ))  
+    model.add(tf.keras.layers.Dense(units=500,
                                   activation='relu',
                                   kernel_regularizer=regularizers.l2(reg_rate) ))    
     model.add(tf.keras.layers.Dropout(rate=dropout_rate))
+    model.add(tf.keras.layers.Dense(units=300,
+                                  activation='relu',
+                                  kernel_regularizer=regularizers.l2(reg_rate) ))    
+    model.add(tf.keras.layers.Dropout(rate=dropout_rate))
+    model.add(tf.keras.layers.Dense(units=300,
+                                  activation='relu',
+                                  kernel_regularizer=regularizers.l2(reg_rate) ))  
+    model.add(tf.keras.layers.Dropout(rate=dropout_rate))
+    model.add(tf.keras.layers.Dense(units=300,
+                                  activation='relu',
+                                  kernel_regularizer=regularizers.l2(reg_rate) ))  
+    model.add(tf.keras.layers.Dropout(rate=dropout_rate))
 
     model.add(tf.keras.layers.Dense(units=128,
                                   activation='relu',
                                   kernel_regularizer=regularizers.l2(reg_rate) ))  
     model.add(tf.keras.layers.Dropout(rate=dropout_rate))
-
-
     model.add(tf.keras.layers.Dense(units=128,
                                   activation='relu',
                                   kernel_regularizer=regularizers.l2(reg_rate) ))  
@@ -145,7 +119,7 @@ def create_model(learning_rate, feature_layer):
 def train_model(model, dataset, epochs, label_name, batch_size=None):
     # Split the dataset into features and label.
     del dataset['Date']
-    del dataset['LCC_Market_Share']
+    del dataset['Labor_Force']
     features = {name:np.array(value) for name, value in dataset.items()}
     label = np.array(features.pop(label_name))
     
@@ -187,6 +161,6 @@ def train():
     
     #plot_the_loss_curve(epochs, mse)
     
-    shutil.rmtree('models\\model1\\', ignore_errors=True, onerror=None)
-    model.save('models\\model1\\')
+    shutil.rmtree('models\\model2\\', ignore_errors=True, onerror=None)
+    model.save('models\\model2\\')
 #train()

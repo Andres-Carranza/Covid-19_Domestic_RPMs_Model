@@ -1,22 +1,160 @@
-State,COVID-19 Deaths,Total Deaths,Percent of Expected Deaths,Date
-United States,1.0,58179.0,0.98,02/01/2020
-United States,1.0,58771.0,0.98,02/08/2020
-United States,0.0,57904.0,0.98,02/15/2020
-United States,5.0,57864.0,1.0,02/22/2020
-United States,5.0,58250.0,1.01,02/29/2020
-United States,33.0,58515.0,1.01,03/07/2020
-United States,52.0,57428.0,1.01,03/14/2020
-United States,551.0,58059.0,1.02,03/21/2020
-United States,3052.0,62067.0,1.11,03/28/2020
-United States,9504.0,70838.0,1.27,04/04/2020
-United States,15698.0,77492.0,1.4,04/11/2020
-United States,16350.0,74839.0,1.38,04/18/2020
-United States,14103.0,70998.0,1.32,04/25/2020
-United States,11670.0,65877.0,1.23,05/02/2020
-United States,10747.0,63528.0,1.21,05/09/2020
-United States,8772.0,59998.0,1.15,05/16/2020
-United States,6666.0,56162.0,1.08,05/23/2020
-United States,5445.0,52943.0,1.01,05/30/2020
-United States,3904.0,49147.0,0.92,06/06/2020
-United States,2148.0,40134.0,0.73,06/13/2020
-United States,481.0,23276.0,0.37,06/20/2020
+country,c,date,deaths
+United States,USA,"Jan 22, 2020",0
+United States,USA,"Jan 23, 2020",0
+United States,USA,"Jan 24, 2020",0
+United States,USA,"Jan 25, 2020",0
+United States,USA,"Jan 26, 2020",0
+United States,USA,"Jan 27, 2020",0
+United States,USA,"Jan 28, 2020",0
+United States,USA,"Jan 29, 2020",0
+United States,USA,"Jan 30, 2020",0
+United States,USA,"Jan 31, 2020",0
+United States,USA,"Feb 1, 2020",0
+United States,USA,"Feb 2, 2020",0
+United States,USA,"Feb 3, 2020",0
+United States,USA,"Feb 4, 2020",0
+United States,USA,"Feb 5, 2020",0
+United States,USA,"Feb 6, 2020",0
+United States,USA,"Feb 7, 2020",0
+United States,USA,"Feb 8, 2020",0
+United States,USA,"Feb 9, 2020",0
+United States,USA,"Feb 10, 2020",0
+United States,USA,"Feb 11, 2020",0
+United States,USA,"Feb 12, 2020",0
+United States,USA,"Feb 13, 2020",0
+United States,USA,"Feb 14, 2020",0
+United States,USA,"Feb 15, 2020",0
+United States,USA,"Feb 16, 2020",0
+United States,USA,"Feb 17, 2020",0
+United States,USA,"Feb 18, 2020",0
+United States,USA,"Feb 19, 2020",0
+United States,USA,"Feb 20, 2020",0
+United States,USA,"Feb 21, 2020",0
+United States,USA,"Feb 22, 2020",0
+United States,USA,"Feb 23, 2020",0
+United States,USA,"Feb 24, 2020",0
+United States,USA,"Feb 25, 2020",0
+United States,USA,"Feb 26, 2020",0
+United States,USA,"Feb 27, 2020",0
+United States,USA,"Feb 28, 2020",0
+United States,USA,"Feb 29, 2020",0
+United States,USA,"Mar 1, 2020",1
+United States,USA,"Mar 2, 2020",1
+United States,USA,"Mar 3, 2020",4
+United States,USA,"Mar 4, 2020",3
+United States,USA,"Mar 5, 2020",2
+United States,USA,"Mar 6, 2020",1
+United States,USA,"Mar 7, 2020",2
+United States,USA,"Mar 8, 2020",3
+United States,USA,"Mar 9, 2020",4
+United States,USA,"Mar 10, 2020",5
+United States,USA,"Mar 11, 2020",2
+United States,USA,"Mar 12, 2020",2
+United States,USA,"Mar 13, 2020",10
+United States,USA,"Mar 14, 2020",7
+United States,USA,"Mar 15, 2020",10
+United States,USA,"Mar 16, 2020",12
+United States,USA,"Mar 17, 2020",16
+United States,USA,"Mar 18, 2020",23
+United States,USA,"Mar 19, 2020",42
+United States,USA,"Mar 20, 2020",0
+United States,USA,"Mar 21, 2020",110
+United States,USA,"Mar 22, 2020",80
+United States,USA,"Mar 23, 2020",131
+United States,USA,"Mar 24, 2020",119
+United States,USA,"Mar 25, 2020",211
+United States,USA,"Mar 26, 2020",249
+United States,USA,"Mar 27, 2020",246
+United States,USA,"Mar 28, 2020",411
+United States,USA,"Mar 29, 2020",484
+United States,USA,"Mar 30, 2020",318
+United States,USA,"Mar 31, 2020",661
+United States,USA,"Apr 1, 2020",909
+United States,USA,"Apr 2, 2020",1059
+United States,USA,"Apr 3, 2020",915
+United States,USA,"Apr 4, 2020",1104
+United States,USA,"Apr 5, 2020",1344
+United States,USA,"Apr 6, 2020",1146
+United States,USA,"Apr 7, 2020",1342
+United States,USA,"Apr 8, 2020",1906
+United States,USA,"Apr 9, 2020",1922
+United States,USA,"Apr 10, 2020",1873
+United States,USA,"Apr 11, 2020",2087
+United States,USA,"Apr 12, 2020",1831
+United States,USA,"Apr 13, 2020",1500
+United States,USA,"Apr 14, 2020",1541
+United States,USA,"Apr 15, 2020",2408
+United States,USA,"Apr 16, 2020",4928
+United States,USA,"Apr 17, 2020",2299
+United States,USA,"Apr 18, 2020",3770
+United States,USA,"Apr 19, 2020",1856
+United States,USA,"Apr 20, 2020",1772
+United States,USA,"Apr 21, 2020",1857
+United States,USA,"Apr 22, 2020",2524
+United States,USA,"Apr 23, 2020",1721
+United States,USA,"Apr 24, 2020",3179
+United States,USA,"Apr 25, 2020",1054
+United States,USA,"Apr 26, 2020",2172
+United States,USA,"Apr 27, 2020",1687
+United States,USA,"Apr 28, 2020",1369
+United States,USA,"Apr 29, 2020",2110
+United States,USA,"Apr 30, 2020",2611
+United States,USA,"May 1, 2020",2040
+United States,USA,"May 2, 2020",2062
+United States,USA,"May 3, 2020",1317
+United States,USA,"May 4, 2020",1297
+United States,USA,"May 5, 2020",1252
+United States,USA,"May 6, 2020",2144
+United States,USA,"May 7, 2020",2353
+United States,USA,"May 8, 2020",2239
+United States,USA,"May 9, 2020",1510
+United States,USA,"May 10, 2020",1614
+United States,USA,"May 11, 2020",734
+United States,USA,"May 12, 2020",1156
+United States,USA,"May 13, 2020",1703
+United States,USA,"May 14, 2020",1746
+United States,USA,"May 15, 2020",1773
+United States,USA,"May 16, 2020",1662
+United States,USA,"May 17, 2020",1186
+United States,USA,"May 18, 2020",808
+United States,USA,"May 19, 2020",791
+United States,USA,"May 20, 2020",1568
+United States,USA,"May 21, 2020",1518
+United States,USA,"May 22, 2020",1263
+United States,USA,"May 23, 2020",1305
+United States,USA,"May 24, 2020",1080
+United States,USA,"May 25, 2020",633
+United States,USA,"May 26, 2020",500
+United States,USA,"May 27, 2020",696
+United States,USA,"May 28, 2020",1526
+United States,USA,"May 29, 2020",1175
+United States,USA,"May 30, 2020",1219
+United States,USA,"May 31, 2020",945
+United States,USA,"Jun 1, 2020",602
+United States,USA,"Jun 2, 2020",764
+United States,USA,"Jun 3, 2020",1034
+United States,USA,"Jun 4, 2020",994
+United States,USA,"Jun 5, 2020",1036
+United States,USA,"Jun 6, 2020",932
+United States,USA,"Jun 7, 2020",659
+United States,USA,"Jun 8, 2020",712
+United States,USA,"Jun 9, 2020",493
+United States,USA,"Jun 10, 2020",999
+United States,USA,"Jun 11, 2020",918
+United States,USA,"Jun 12, 2020",896
+United States,USA,"Jun 13, 2020",849
+United States,USA,"Jun 14, 2020",767
+United States,USA,"Jun 15, 2020",296
+United States,USA,"Jun 16, 2020",395
+United States,USA,"Jun 17, 2020",836
+United States,USA,"Jun 18, 2020",754
+United States,USA,"Jun 19, 2020",717
+United States,USA,"Jun 20, 2020",678
+United States,USA,"Jun 21, 2020",607
+United States,USA,"Jun 22, 2020",256
+United States,USA,"Jun 23, 2020",427
+United States,USA,"Jun 24, 2020",826
+United States,USA,"Jun 25, 2020",751
+United States,USA,"Jun 26, 2020",2437
+United States,USA,"Jun 27, 2020",623
+United States,USA,"Jun 28, 2020",500
