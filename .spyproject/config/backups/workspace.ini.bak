@@ -6,5 +6,5 @@ save_non_project_files = False
 
 [main]
 version = 0.2.0
-recent_files = ['train_model.py', 'predict.py', 'data\\training_data.csv', 'data\\prediction_features\\july_recovery.csv']
+recent_files = ['train_model.py', 'predict.py']
 

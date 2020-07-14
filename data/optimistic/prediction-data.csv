@@ -1,0 +1,5 @@
+jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec,leap-feb,thanksgiving-nov,thanksgiving-dec,gulf-war,9/2001,iraq-war,sars-outbreak,great-recession,months-since-9/11,months-since-covid-19,unemployment-rate,nonfarm-payroll,deaths,new-infected,current-infected
+0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,226,4,9.2,141330,442.1935484,135448.3548,1984873.871
+0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,227,5,9.7,140160,361.0645161,113580.2903,1819105.677
+0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,228,6,10.0,139550,277.1,85557.23333,1358418.367
+0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,229,7,10.1,139190,213.8387097,69520.06452,1093462.419
