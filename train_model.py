@@ -6,7 +6,7 @@ import math
 import shutil
 
 def apply_inverse(data):
-    data['months-since-covid-19'] = 1/ data['months-since-covid-19'] ** 2
+    data['months-since-covid-19'] = 1/ data['months-since-covid-19'] ** 1
     data['months-since-9/11'] = 1 / data['months-since-9/11'] **2
     data = data.replace(math.inf,0)
 

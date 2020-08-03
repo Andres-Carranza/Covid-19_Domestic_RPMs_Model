@@ -67,7 +67,7 @@ def predict_historical():
     model = keras.models.load_model('model')
    
     
-    historical_data = load_historical_data(-5,0)
+    historical_data = load_historical_data()
 
     prediction_data = tm.normalize_data(pd.read_csv('data/prediction-data.csv'))
     historical_data = historical_data.append(prediction_data, ignore_index = True)
@@ -81,7 +81,7 @@ def predict_historical():
     
 
 
-tm.train()
+#tm.train()
 predict_historical()
 plt.show()
 
