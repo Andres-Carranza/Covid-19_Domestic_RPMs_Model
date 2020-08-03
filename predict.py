@@ -6,9 +6,8 @@ import numpy as np
 import train_model as tm
 import math 
 
-def load_historical_data(model_name,start_index = 0, end_index = 0)  :
-    historical_data = pd.read_csv('data/{}/training-data.csv'.format(model_name))
-    max_rpms = max(historical_data['rpms'])
+def load_historical_data(start_index = 0, end_index = 0)  :
+    historical_data = pd.read_csv('data/training-data.csv')
     historical_data = tm.normalize_data(historical_data)
     
     print('\n\n\nLoaded data')
@@ -20,9 +19,9 @@ def load_historical_data(model_name,start_index = 0, end_index = 0)  :
     elif end_index == 0:
         end_index = len(historical_data.index)
         
-    return historical_data.loc[start_index:end_index], max_rpms
+    return historical_data.loc[start_index:end_index]
     
-def predict(features_data,model,max_rpms):
+def predict(features_data,model):
         
     features = {name:np.array(value) for name, value in features_data.items()}
     
@@ -35,10 +34,10 @@ def predict(features_data,model,max_rpms):
 
 
     for i, prediction in enumerate(predictions):
-        results.loc[i,'rpms'] = prediction[0] * max_rpms
+        results.loc[i,'rpms'] = prediction[0] * 71230170772
 
     for i, row in features_data.iterrows():
-        features_data.loc[i,'rpms'] = row['rpms'] * max_rpms
+        features_data.loc[i,'rpms'] = row['rpms'] * 71230170772
 
     for i, row in results.iterrows():
         results.loc[i,'rpms'] = max(row['rpms'],0)
@@ -59,34 +58,31 @@ def plot_results(results, historical_data):
             
     axes.plot(historical_data['rpms']/1000000000, label='Actual RPMs')
         
-    axes.plot(results['rpms']/1000000000, label=model_name)
+    axes.plot(results['rpms']/1000000000, label='model')
     plt.legend(loc= "lower left")
     
 
-def predict_historical(model_name):
+def predict_historical():
 
-    model = keras.models.load_model('models/{}'.format(model_name))
+    model = keras.models.load_model('model')
    
     
-    historical_data,max_rpms = load_historical_data(model_name)
+    historical_data = load_historical_data(-5,0)
 
-
-    prediction_data = tm.normalize_data(pd.read_csv('data/{}/prediction-data.csv'.format(model_name)))
+    prediction_data = tm.normalize_data(pd.read_csv('data/prediction-data.csv'))
     historical_data = historical_data.append(prediction_data, ignore_index = True)
-    
-    results,historical_data  = predict(historical_data, model,max_rpms)
+    results,historical_data  = predict(historical_data, model)
 
     plot_results(results, historical_data)
     
     del results['index']
-    results.to_csv('data/{}/predicted-rpms.csv'.format(model_name), index = False)    
+    results.to_csv('data/predicted-rpms.csv', index = False)    
 
     
-model_names = ['baseline', 'pessimistic','optimistic']
-model_name = model_names[0]
 
-tm.train(model_name)
-predict_historical(model_name)
+
+tm.train()
+predict_historical()
 plt.show()
 
 

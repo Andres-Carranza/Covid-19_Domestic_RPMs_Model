@@ -6,7 +6,7 @@ import math
 import shutil
 
 def apply_inverse(data):
-    data['months-since-covid-19'] = 1/ data['months-since-covid-19'] ** 1
+    data['months-since-covid-19'] = 1/ data['months-since-covid-19'] ** 2
     data['months-since-9/11'] = 1 / data['months-since-9/11'] **2
     data = data.replace(math.inf,0)
 
@@ -14,9 +14,18 @@ def apply_inverse(data):
 
 def normalize_data(data):
     data = apply_inverse(data)
-    
+
+    max_vals = {
+        'jan':1,'feb':1,'mar':1,'apr':1,'may':1,'jun':1,'jul':1,'aug':1,'sep':1,'oct':1,'nov':1,'dec':1,
+        'leap-feb':1,'thanksgiving-nov':1,'thanksgiving-dec':1,
+        'gulf-war':1, '9/2001':1, 'iraq-war':1,'sars-outbreak':1,'great-recession':1,
+        'months-since-9/11':1,'months-since-covid-19':1,
+        'unemployment-rate':14.7,'nonfarm-payroll':152463,
+        'deaths':1955.033333,'new-infected':204180.4,'current-infected':3367528.167,
+        'rpms':71230170772,
+    }
     for col in data.columns:
-        data[col] = data[col] / max(max(data[col]),1)
+        data[col] = data[col] / max_vals[col]
 
     return data
  
@@ -92,9 +101,9 @@ def train_model(model, dataset, epochs, label_name, batch_size=None):
     
     return mse
 
-def train(model_name):
+def train():
     
-    training_data = pd.read_csv('data/{}/training-data.csv'.format(model_name))
+    training_data = pd.read_csv('data/training-data.csv')
     print('Loaded data')
     
     training_data = normalize_data(training_data)
@@ -119,11 +128,18 @@ def train(model_name):
     # defined by the feature_layer.
     mse = train_model(model,training_data , epochs, 
                               label_name, batch_size)
-    
-    shutil.rmtree('models/{}'.format(model_name))
-    model.save('models/{}'.format(model_name))
-    mse.to_csv('models/{}/mean_squared_error.csv'.format(model_name), index = False)
-    
-    with open('models/{}/summary.txt'.format(model_name),'w') as fh:
-        model.summary(print_fn=lambda x: fh.write(x + '\n'))
 
+    valid_data = pd.read_csv('data/validation-data.csv')
+    valid_data = normalize_data(valid_data)
+
+    test_features = {name:np.array(value) for name, value in valid_data.items()}
+    test_label = np.array(test_features.pop('rpms')) # isolate the label
+    print("\n Evaluate the  model against the test set:")
+    model.evaluate(x = test_features, y = test_label, batch_size=batch_size)
+
+    shutil.rmtree('model')
+    model.save('model')
+    mse.to_csv('model/mean_squared_error.csv', index = False)
+    
+    with open('model/summary.txt','w') as fh:
+        model.summary(print_fn=lambda x: fh.write(x + '\n'))
