@@ -54,11 +54,10 @@ def plot_results(results, historical_data):
     plt.xlabel('Date')
     plt.ylabel('RPMs (billions)')
             
-    all_data = results['rpms'].append(historical_data['rpms'])
             
-    axes.plot(historical_data['rpms']/1000000000, label='Actual RPMs')
+    axes.plot(historical_data['rpms'][-10:] /1000000000, label='Actual RPMs')
         
-    axes.plot(results['rpms']/1000000000, label='model')
+    axes.plot(results['rpms'][-10:]/1000000000, label='model')
     plt.legend(loc= "lower left")
     
 
